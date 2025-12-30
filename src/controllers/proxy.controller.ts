@@ -136,9 +136,23 @@ export const proxyCapability = async (req: Request, res: ExpressResponse, next: 
       return;
     }
 
-    const text = await upstreamResp.text();
+    const contentType = upstreamResp.headers.get('content-type') || 'application/json; charset=utf-8';
+    const contentDisposition = upstreamResp.headers.get('content-disposition');
+
     res.status(upstreamResp.status);
-    res.setHeader('Content-Type', upstreamResp.headers.get('content-type') || 'application/json; charset=utf-8');
+    res.setHeader('Content-Type', contentType);
+    if (contentDisposition) {
+      res.setHeader('Content-Disposition', contentDisposition);
+    }
+
+    // Si viene binario (PDF u otros), reenviar como buffer
+    if (/application\/pdf/i.test(contentType) || /^image\//i.test(contentType) || /octet-stream/i.test(contentType)) {
+      const buf = Buffer.from(await upstreamResp.arrayBuffer());
+      res.send(buf);
+      return;
+    }
+
+    const text = await upstreamResp.text();
     res.send(text);
   } catch (error) {
     next(error);
