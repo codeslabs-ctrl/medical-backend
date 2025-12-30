@@ -1,0 +1,20 @@
+# Secrets
+.env
+.env.*
+*.env
+config.env
+config.dev.env
+
+# Dependencies / builds
+node_modules/
+dist/
+build/
+coverage/
+
+# OS / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# PDFs / exports
+*.pdf
